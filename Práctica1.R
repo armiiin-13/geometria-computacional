@@ -44,7 +44,7 @@ altura<- function(p1,p2,p3){
   A <- matrix(c(v, -v_ort), nrow=2, ncol=2, byrow=FALSE)
   B<-p3-p1
   solucion <- solve(A, B)
-  pcorte<-v_ort *solucion + p3
+  pcorte<-v_ort *solucion[2] + p3
   valtura<-pcorte-p3
   return(sqrt(sum(valtura^2))) 
 }
@@ -60,8 +60,7 @@ area<- function(p1,p2,p3,p4){
    base<-sqrt(sum((vbase)^2))
    print(paste("El area del triangulo es base*h/2, lo cual es ", base*h/2  ))
    print(paste("Por tanto el area del paralelogramo es 2 veces eso ", base*h ))
-   
-   #solo los ordeno para la función plot no para el area
+   #solo los ordeno para la función plot
    j<-matrix(c(p1,p2,p3,p4),nrow = 4,ncol=2,byrow = TRUE)
    mpuntos<- j[order(j[,1],j[,2]),]
    a<-mpuntos[1,]
@@ -83,6 +82,41 @@ area<- function(p1,p2,p3,p4){
     a<-"No es un paralelogramo"
   }
 }
+
+
+#ejemplo 1 
+p1<-c(1,0)
+p2<-c(3.5 , 1)
+p3<-c(2.5,2)
+p4<-c(2,-1)
+isParalelogram(p1,p2,p3,p4)
+area(p1,p2,p3,p4)
+
+#ejemplo 2 
+p3<-c(4.5,-1)
+p2<-c(0 , 0)
+p1<-c(4.5,1)
+p4<-c(0,2)
+isParalelogram(p1,p2,p3,p4)
+area(p1,p2,p3,p4)
+
+
+#ejemplo 3
+p3<-c(-1,2)
+p2<-c(1, 2)
+p1<-c(0,0)
+p4<-c(0,4)
+isParalelogram(p1,p2,p3,p4)
+area(p1,p2,p3,p4)
+
+#ejemplo 4
+p3<-c(-1,0)
+p2<-c(1, 0)
+p1<-c(2,4)
+p4<-c(0,4)
+isParalelogram(p1,p2,p3,p4)
+area(p1,p2,p3,p4)
+
 
 
 
