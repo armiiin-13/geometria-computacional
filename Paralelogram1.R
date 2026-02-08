@@ -21,6 +21,27 @@ module <- function(v){
   return(sqrt(counter))
 }
 
+are_colineal <- function(v1, v2){
+  if (v1[1] != 0 && v2[1] == 0){
+    return(FALSE)
+  }
+  if (v1[1] == 0 && v2[1] == 0){
+    if (length(v1) > 1){
+      return(are_colineal(v1[-1], v2[-1]))
+    } else {
+      return(TRUE) # v1 y v2 son el vector nulo
+    }
+  }
+  lambda <- v1[1]/v2[1]
+  n = length(v1)
+  for (i in 2:n){
+    if (v1[i] != lambda * v2[i]){
+      return(FALSE)
+    }
+  }
+  return(TRUE)
+}
+
 dot_product <- function(v1, v2){
   # Ya se ha comprobado si son vectores de la misma longitud
   suma <- 0
@@ -33,17 +54,24 @@ dot_product <- function(v1, v2){
 }
 
 area_paralelogram <- function(v1, v2){
-  # Comprobar que los dos argumentos son vectores de la misma longitud (no nulos)
+  # Se comprueba que los dos argumentos son vectores de la misma longitud (no nulos)
   if (!is.vector(v1) || !is.vector(v2)){
     stop("Alguno de los argumentos no es un vector")
   }
   
+  # Se comprueba que los vectores tienen la misma dimensión
   if (length(v1) != length(v2)){
     stop("Los vectores deben ser de la misma longitud")
   }
   
+  # Se comprueba que los vectores no son nulos
   if (module(v1) == 0 || module(v2) == 0){
     stop("Alguno de los vectores es nulo")
+  }
+  
+  # Se comprueba que los vectores no son colineales
+  if (are_colineal(v1,v2)){
+    stop("Los vectores son colineales")
   }
   
   # Los dos vectores forman un triangulo de área 1/2(|a||b| sen \alpha)
@@ -124,6 +152,11 @@ draw_paralelogram <- function(p, v1,v2){
     stop("Alguno de los vectores es nulo")
   }
   
+  # Se comprueba que los vectores no son colineales
+  if (are_colineal(v1,v2)){
+    stop("Los vectores son colineales")
+  }
+  
   # Hallar los 4 vértices (p es uno de ellos)
   p1 = p + v1
   p2 = p + v2
@@ -147,19 +180,22 @@ draw_paralelogram <- function(p, v1,v2){
 
 # Testing 
 v1 = c(3,2)
-v2 = c(0,0)
+v2 = c(0,0) # vector nulo
 v3 = c(-1, -5)
 v4 = c(9,1)
 v5 = c(-2,4)
+v6 = c(6,4) # colineal con v1
 p_origin = c(0,0)
 p = c(3,2)
 
 ## Areas
 area_paralelogram(v3,v2)
+area_paralelogram(v1,v6)
 area_paralelogram(v4,v5)
 area_paralelogram(v1,v3)
 
 ## Drawings
 draw_paralelogram(p_origin,v3,v2)
+draw_paralelogram(p_origin,v1,v6)
 draw_paralelogram(p_origin, v4, v5)
 draw_paralelogram(p,v1,v3)
