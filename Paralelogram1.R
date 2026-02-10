@@ -199,3 +199,5 @@ draw_paralelogram(p_origin,v3,v2)
 draw_paralelogram(p_origin,v1,v6)
 draw_paralelogram(p_origin, v4, v5)
 draw_paralelogram(p,v1,v3)
+draw_paralelogram(p, c(5,2), c(-2,5)) # rombo
+draw_paralelogram(p_origin, c(2,0), c(0,3)) #rectángulo
