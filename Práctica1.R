@@ -1,5 +1,5 @@
 ##################################################################################
-# Práctica 1: Paralelogramo
+# Ejercicio 1: Paralelogramo
 # Autores: Rodrigo López Torres y Arminda García Moreno
 # Fecha : 05/02/2026 
 # Propósito: Calcular el área de un paralelogramo descomponiéndolo en triángulos
@@ -84,6 +84,13 @@ area<- function(p1,p2,p3,p4){
 }
 
 
+#ejemplo 0
+p1<-c(0,0)
+p2<-c(1, 0)
+p3<-c(1,1)
+p4<-c(0,1)
+isParalelogram(p1,p2,p3,p4)
+area(p1,p2,p3,p4)
 #ejemplo 1 
 p1<-c(1,0)
 p2<-c(3.5 , 1)
@@ -110,12 +117,41 @@ isParalelogram(p1,p2,p3,p4)
 area(p1,p2,p3,p4)
 
 #ejemplo 4
-p3<-c(-1,0)
+p1<-c(-1,0)
 p2<-c(1, 0)
-p1<-c(2,4)
+p3<-c(2,4)
 p4<-c(0,4)
 isParalelogram(p1,p2,p3,p4)
 area(p1,p2,p3,p4)
+
+#Ejemplo 5 no furula por puntos iguales
+p1<-c(1,0)
+p2<-c(1, 0)
+p3<-c(2,4)
+p4<-c(2,4)
+isnotequals(p1,p2,p3,p4)
+isParalelogram(p1,p2,p3,p4) 
+a<-area(p1,p2,p3,p4)
+a
+#Ejemplo 6 no funciona por no ser paralelogramo 4 puntos alineados
+p3<-c(1,0)
+p2<-c(2, 0)
+p1<-c(4,0)
+p4<-c(6,0)
+isnotequals(p1,p2,p3,p4)
+isParalelogram(p1,p2,p3,p4) 
+a<-area(p1,p2,p3,p4)
+a
+#Ejemplo 7 no funciona por no ser paralelogramo
+p1<-c(1,0)
+p2<-c(0, 0)
+p3<-c(1,1)
+p4<-c(1,-1)
+isnotequals(p1,p2,p3,p4)
+isParalelogram(p1,p2,p3,p4) 
+a<-area(p1,p2,p3,p4)
+a
+
 
 
 
