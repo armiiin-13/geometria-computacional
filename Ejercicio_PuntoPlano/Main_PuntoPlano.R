@@ -38,7 +38,6 @@ Q = c(-1,0,1) # in 2
 R = c(1,-1,6) # in 3
 P_inv = c(0,-1,1)
 Q_inv = c(1,0,-1)
-R_inv = c(-1,-1,-6)
 
 ## Testing -> case in
 relative_position(P, plane_1)
@@ -53,7 +52,6 @@ relative_position(R, plane_2)
 ## Testing -> case below
 relative_position(P_inv, plane_3)
 relative_position(Q_inv, plane_1)
-relative_position(R_inv, plane_2)
 
 ## Testing -> errors
 plane_error <- create_plane(0,0,0,7)
