@@ -41,10 +41,10 @@ area <- 0 #accumulates the area calculated
 
 # create plot (empty)
 plot(0, 0,
-     type = "n",        # no dibuja puntos
-     xlim = c(0, 10),  # ajusta a tu rango real
+     type = "n",        
+     xlim = c(0, 10),  
      ylim = c(0, 10),
-     asp = 1,           # escala igual en ejes
+     asp = 1, 
      xlab = "X", ylab = "Y")
 
 for (i in (1:nrow(data))){ # for each row
