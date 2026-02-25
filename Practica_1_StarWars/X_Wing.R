@@ -37,3 +37,4 @@ area_spaceship <- function(path){
   # path = path to the xlsx file containing the spaceship reference points
 
 }
+#patata
