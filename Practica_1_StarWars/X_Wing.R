@@ -91,17 +91,60 @@ area_paralelogram<- function(p1,p2,p3,p4){
     a<-"No es un paralelogramo"
   }
 }
-area_circle<- function(){
-  
+area_circle<- function(n,r){ # r radio y n divisiones
+  total<-0
+  for(i in 1:n){
+    p1<-c(0,0)
+    p2<-c(r*cos((i-1)*2* pi /(n)),r*sin((i-1)*2* pi /(n)))
+    p3<-c(r*cos(i*2* pi /(n)),r*sin(i*2* pi /(n)))
+    total=total+area_triangle(p2,p3,p1)
+  }
+  return(total)
 }
 
 # ---- DRAW FIGURES FUNCTIONS ----
 draw_triangle <- function(p1,p2,p3){
-  
+    #una vez sabemos que es paralelogramo da igual que 3 puntos tomemos
+    #ordeno para la función plot
+    j<-matrix(c(p1,p2,p3),nrow = 3,ncol=2,byrow = TRUE)
+    mpuntos<- j[order(j[,1],j[,2]),]
+    t1<-c(p1[1],p2[1],p3[1])
+    t2<-c(p1[2],p2[2],p3[2])
+    polygon(t1, t2, col = "lightgreen", lty = 1, lwd = 2, border = "purple")
 }
 
 draw_paralelogram <- function(p1,p2,p3,p4){
-  
+  if(isnotequals(p1,p2,p3,p4)&isParalelogram(p1,p2,p3,p4)){
+    #una vez sabemos que es paralelogramo da igual que 3 puntos tomemos
+    #ordeno para la función plot
+    j<-matrix(c(p1,p2,p3,p4),nrow = 4,ncol=2,byrow = TRUE)
+    mpuntos<- j[order(j[,1],j[,2]),]
+    a<-mpuntos[1,]
+    b<-mpuntos[2,]
+    c<-mpuntos[3,]
+    d<-mpuntos[4,]
+    x <- c(a[1], b[1],d[1],c[1])
+    y <- c(a[2], b[2],d[2],c[2])
+    t1<-c(p1[1],p2[1],p3[1])
+    t2<-c(p1[2],p2[2],p3[2])
+    polygon(x, y, col = "yellow", lty = 1, lwd = 2, border = "black")
+    polygon(t1, t2, col = "lightpink", lty = 1, lwd = 2, border = "lightblue")
+    
+  }
+  else{
+    print("No es un paralelogramo")
+  }
+}
+
+draw_circle <- function(n,r){
+  for(i in 1:n){
+    p1<-c(0,0)
+    p2<-c(r*cos((i-1)*2* pi /(n)),r*sin((i-1)*2* pi /(n)))
+    p3<-c(r*cos(i*2* pi /(n)),r*sin(i*2* pi /(n)))
+    t1<-c(p1[1],p2[1],p3[1])
+    t2<-c(p1[2],p2[2],p3[2])
+    polygon(t1, t2, col = "lightpink", lty = 1, lwd = 2, border = "lightblue")
+  }
 }
 
 # ---- MAIN FUNCTION ----
@@ -110,16 +153,3 @@ area_spaceship <- function(path){
 
 }
 #patata
-#Cálculo del área paralelogramo
-
-
-
-
-#ejemplo 3
-p3<-c(-1,2)
-p2<-c(1, 2)
-p1<-c(0,0)
-p4<-c(0,4)
-isParalelogram(p1,p2,p3,p4)
-area_paralelogram(p1,p2,p3,p4)
-
