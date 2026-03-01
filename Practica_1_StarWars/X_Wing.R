@@ -63,19 +63,6 @@ altura<- function(p1,p2,p3){
 }
 ############################################################################
 
-
-
-
-
-# ---- PROCESS FIGURE FUNCTIONS ----
-process_triangle <- function(vector){
-  
-}
-
-process_paralelogram <- function(vector){
-  
-}
-
 # ---- AREA CALCULATION FUNCTIONS ----
 area_triangle <- function(p1,p2,p3){
     #Asumimos que se nos da un triangulo
@@ -99,6 +86,7 @@ area_paralelogram<- function(p1,p2,p3,p4){
     
   }
   else{
+    print("No paralelom")
     a<-"No es un paralelogramo"
   }
 }
@@ -196,24 +184,6 @@ process_paralelogram <- function(vector,i){
   return(area_paralelogram(p1,p2,p3,p4))
 }
 
-# ---- AREA CALCULATION FUNCTIONS ----
-area_triangle <- function(p1,p2,p3){
-
-}
-
-area_paralelogram <- function(p1,p2,p3,p4){
-
-}
-
-# ---- DRAW FIGURES FUNCTIONS ----
-draw_triangle <- function(p1,p2,p3){
-
-}
-
-draw_paralelogram <- function(p1,p2,p3,p4){
-
-}
-
 # ---- MAIN FUNCTION ----
 area_spaceship <- function(path){ 
   # path = path to the xlsx file containing the spaceship reference points
@@ -227,8 +197,8 @@ area_spaceship <- function(path){
   # create empty plot for the figure
   plot(0, 0,
        type = "n",        
-       xlim = c(0, 100),  
-       ylim = c(0, 100),
+       xlim = c(-13, 13),  
+       ylim = c(-8, 17),
        asp = 1, 
        xlab = "X", ylab = "Y")
   
@@ -246,7 +216,11 @@ area_spaceship <- function(path){
       area <- area + process_paralelogram(df_row,i)
     }
   }
+  
+  # create the hole
+  area <- area - area_circle(20,0.5)
+  draw_circle(20,0.5)
   print(paste("The X-wing has an area of ", area, " m^2"))
 }
 
-area_spaceship("Practica_1_StarWars/DataTest.xlsx")
+area_spaceship("Practica_1_StarWars/DataSet.xlsx")
