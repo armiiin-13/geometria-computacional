@@ -170,7 +170,7 @@ area_spaceship <- function(path){
   # create the hole
   area <- area - area_circle(20,0.5)
   draw_circle(100,1)
-  print(paste("The X-wing has an area of ", area, " m^2"))
+  print(paste("The X-wing has an area of ", area, " u^2"))
 }
 
 area_spaceship("Practica_1_StarWars/DataSet.xlsx")
