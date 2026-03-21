@@ -2,9 +2,113 @@
 # Load packages for 3d graphics
 library(rgl)
 
+# Affine Tranformation Functions
+traslation <- function(part, q){
+  vertex_old <- part$vertex
+  vertex_new <- matrix(0, nrow = nrow(vertex_old), ncol = 3)
+  
+  for (i in 1:nrow(vertex_old)){
+    for (j in 1:3){
+      vertex_new[i,j] = vertex_old[i,j] + q[j]
+    }
+  }
+  
+  part$vertex = vertex_new
+  if (part$name == "body"){
+    part$extra = q
+  }
+  return(part)
+}
+
+# Simetria respecto a plano suponemos que c=1  z= ax+by +d y movible#################################
+symmetry <- function(part, r){
+  vertex_old <- part$vertex
+  vertex_new <- matrix(0, nrow = nrow(vertex_old), ncol = 3)
+  
+  d = r(0,0)
+  a= r(1,0)-d
+  b=r(0,1)-d
+  c=-1 #Porque en implicito 0= ax+by-z +d
+  vu = c(a,b,c)/sqrt(a^2+b^2+c^2) #normalizo el vector normal
+  R = matrix(c(c(1-2*vu[1]^2,-2*vu[2]*vu[1],-2*vu[1]*vu[3],0),c(-vu[1]*2*vu[2],1-2*vu[2]^2,-2*vu[2]*vu[3],0),c(-2*vu[1]*vu[3],-2*vu[2]*vu[3],1-2*vu[3]^2,0),c(0,0,0,1)), nrow=4, ncol=4, byrow=TRUE)
+  p0   = c(0,0,r(0,0)) # ax+by+cz+d=0 punto en el plano
+  T2 = matrix(c(c(1,0,0,p0[1]),c(0,1,0,p0[2]),c(0,0,1,p0[3]),c(0,0,0,1)), nrow=4, ncol=4, byrow=TRUE)
+  T1 = matrix(c(c(1,0,0,-p0[1]),c(0,1,0,-p0[2]),c(0,0,1,-p0[3]),c(0,0,0,1)), nrow=4, ncol=4, byrow=TRUE)
+  M = T2%*%R%*%T1
+  
+  for(i in 1:nrow(vertex_old)){
+    p_ = M%*%c(vertex_old[i,1],vertex_old[i,2],vertex_old[i,3],1) #aplico la transformación
+    vertex_new[i,]=c(p_[1],p_[2],p_[3])
+  }
+  part$vertex = vertex_new
+  return(part)
+}
+
+rotation <- function(part, theta, axis){
+  #matriz del movimiento
+  
+  if(axis!= 1 & axis != 2& axis != 3){
+    stop("Eje no válido")
+  }
+  else{
+    if(axis==1){#rotación eje x
+      M = matrix(c(
+        c(1, 0, 0),
+        c(0, cos(theta), -sin(theta)),
+        c(0, sin(theta), cos(theta))
+      ), nrow=3, ncol=3, byrow=TRUE)
+      
+    }
+    if (axis==2){#eje y
+      M= matrix(c(
+        c(cos(theta), 0, sin(theta)),
+        c(0, 1, 0),
+        c(-sin(theta), 0, cos(theta))
+      ), nrow=3, ncol=3, byrow=TRUE)
+    }
+    if (axis==3){#eje z
+      
+      M = matrix(c(
+        c(cos(theta), -sin(theta), 0),
+        c(sin(theta), cos(theta), 0),
+        c(0, 0, 1)
+      ), nrow=3, ncol=3, byrow=TRUE)
+    }
+    
+    vertex_old <- part$vertex
+    vertex_new <- matrix(0, nrow = nrow(vertex_old), ncol = 3)
+    
+    for(i in 1:nrow(vertex_old)){
+      vertex_new[i,] = as.vector(M%*%vertex_old[i,])
+    }
+    part$vertex = vertex_new
+    return(part)
+  }
+}
+
+homothety <- function(part, center, k){
+  M = matrix(c(
+    c(k, 0, 0, (1 - k)*center[1]),
+    c(0, k, 0, (1 - k)*center[2]),
+    c(0, 0, k, (1 - k)*center[3]),
+    c(0, 0, 0, 1)
+  ), nrow = 4, ncol = 4, byrow = TRUE)
+  
+  vertex_old <- part$vertex
+  vertex_new <- matrix(0, nrow = nrow(vertex_old), ncol = 3)
+  
+  for(i in 1:nrow(vertex_old)){
+    p1=c(vertex_old[i,],1)
+    p_ = as.vector(M%*%p1)
+    vertex_new[i,]= c(p_[1],p_[2],p_[3])
+  }
+  part$vertex = vertex_new
+  return(part)
+}
+
 # Porygon-Z is composed by 5 independent parts
 create_part <- function(name, vertex, faces){
-  list(name = name, vertex = vertex, faces = faces)
+  list(name = name, vertex = vertex, faces = faces, extra = c(0,0,0))
 }
 
 draw_part <- function(part, color = "skyblue"){ # every part can be separeted into triangles
@@ -25,13 +129,14 @@ draw_part <- function(part, color = "skyblue"){ # every part can be separeted in
 draw_body_colored <- function(part, z_blue_min = -0.35, z_blue_max = 0.55) {
   vertex <- part$vertex
   face <- part$faces
+  limits <- part$extra
   
   for (i in seq_len(nrow(face))) {
     triangle <- vertex[face[i, ], , drop = FALSE]
     
     z_mean <- mean(triangle[, 3])
     
-    color <- if (z_mean >= z_blue_min && z_mean <= z_blue_max) {
+    color <- if (z_mean >= z_blue_min + limits[3] && z_mean <= z_blue_max + limits[3]) {
       "deepskyblue3"
     } else {
       "hotpink2"
@@ -151,7 +256,6 @@ make_limb <- function(
   limb_faces_12 <- connect_rings(idx_ring1, idx_ring2, n_points)
   limb_faces_23 <- connect_rings(idx_ring2, idx_ring3, n_points)
   
-  # cierre redondeado final
   limb_faces_top <- matrix(0, nrow = n_points, ncol = 3)
   for (i in 1:n_points) {
     next_i <- ifelse(i == n_points, 1, i + 1)
@@ -202,10 +306,10 @@ n_body <- 50
 
 top    <- c(0, 0,  1.2)
 
-ring1  <- make_ring(0.5, 0.55,  0.8, n_points = n_body)
-ring2  <- make_ring(1.0, 0.85,  0.2, n_points = n_body)  # blue part
-ring3  <- make_ring(0.9, 0.75, -0.5, n_points = n_body)
-ring4  <- make_ring(0.4, 0.45, -1.0, n_points = n_body)
+ring1  <- make_ring(0.3, 0.55,  0.8, n_points = n_body)
+ring2  <- make_ring(0.8, 0.85,  0.2, n_points = n_body)  # blue part
+ring3  <- make_ring(0.7, 0.75, -0.5, n_points = n_body)
+ring4  <- make_ring(0.2, 0.45, -1.0, n_points = n_body)
 
 bottom <- c(0, 0, -1.4)
 
@@ -228,7 +332,7 @@ idx_bottom <- idx_ring4 + n_body
 faces_top <- matrix(0, nrow = n_body, ncol = 3)
 
 for (i in 1:n_body) {
-  next_i <- ifelse(i == n, 1, i + 1)
+  next_i <- ifelse(i == n_body, 1, i + 1)
   
   faces_top[i, ] <- c(
     idx_top,
@@ -244,7 +348,7 @@ faces_34 <- connect_rings(idx_ring3, idx_ring4, n_body)
 faces_bottom <- matrix(0, nrow = n_body, ncol = 3)
 
 for (i in 1:n_body) {
-  next_i <- ifelse(i == n, 1, i + 1)
+  next_i <- ifelse(i == n_body, 1, i + 1)
   
   faces_bottom[i, ] <- c(
     idx_ring4 + i - 1,
@@ -345,7 +449,7 @@ beak_ring2 <- make_ring(0.30, 0.22, -1.00, n_points = n_beak)
 beak_ring2 <- beak_ring2[, c(1, 3, 2)]
 beak_ring2[,3] <- beak_ring2[,3] + z_beak
 
-beak_front <- c(0, -1.1, z_beak)
+beak_front <- c(0, -1.5, z_beak)
 
 beak_vertex <- rbind(
   beak_back,
@@ -478,8 +582,8 @@ right_arm <- make_limb(
 right_arm <- orient_limb_to_x(right_arm)
 right_arm <- tilt_limb_down(right_arm, amount = 0.65, side = "right")
 
-right_arm$vertex[,1] <- right_arm$vertex[,1] + 1.00
-right_arm$vertex[,3] <- right_arm$vertex[,3] + 0.10
+right_arm$vertex[,1] <- right_arm$vertex[,1] + 0.7
+right_arm$vertex[,3] <- right_arm$vertex[,3] + 0.1
 
 left_arm <- make_limb(
   name = "left_arm",
@@ -495,8 +599,8 @@ left_arm$vertex[,1] <- -left_arm$vertex[,1]
 
 left_arm <- tilt_limb_down(left_arm, amount = 0.65, side = "left")
 
-left_arm$vertex[,1] <- left_arm$vertex[,1] - 1.00
-left_arm$vertex[,3] <- left_arm$vertex[,3] + 0.10
+left_arm$vertex[,1] <- left_arm$vertex[,1] - 0.7
+left_arm$vertex[,3] <- left_arm$vertex[,3] + 0.1
 
 tail <- make_limb(
   name = "tail",
@@ -520,4 +624,21 @@ porygon_z <- list(
   tail = tail
 )
 
+draw_model(porygon_z)
+
+# Testing
+body = traslation(porygon_z$body, c(20,4,-10))
+porygon_z$body = body
+draw_model(porygon_z)
+
+head = symmetry(porygon_z$head, function(x,y) 2*x-2*y+4)
+porygon_z$head = head
+draw_model(porygon_z)
+
+tail = rotation(porygon_z$tail, pi/2, 2)
+porygon_z$tail = tail
+draw_model(porygon_z)
+
+right_arm = homothety(porygon_z$right_arm, c(1,5,1),4)
+porygon_z$right_arm = right_arm
 draw_model(porygon_z)
