@@ -1,4 +1,3 @@
-
 # Load packages for 3d graphics
 library(rgl)
 
@@ -106,11 +105,12 @@ homothety <- function(part, center, k){
   return(part)
 }
 
-# Porygon-Z is composed by 5 independent parts
+# Porygon-Z is composed by independent parts
 create_part <- function(name, vertex, faces){
   list(name = name, vertex = vertex, faces = faces, extra = c(0,0,0))
 }
 
+# Draw 3d figures auxiliar functions
 draw_part <- function(part, color = "skyblue"){ # every part can be separeted into triangles
   vertex <- part$vertex;
   face <- part$faces;
@@ -167,7 +167,7 @@ draw_model <- function(model){
   grid3d(c("x", "y", "z"))
 }
 
-# Auxiliar Functions to Create the Model
+# Auxiliar functions to create the model
 make_ring <- function(radius_x, radius_y, z, n_points = 50) {
   angles <- seq(0, 2*pi, length.out = n_points + 1)[- (n_points + 1)]
   x <- radius_x * cos(angles)
@@ -195,17 +195,74 @@ connect_rings <- function(start1, start2, n) {
   faces
 }
 
-make_limb <- function(
-    name = "limb",
-    z0 = 0,
-    y_shift = 0,
-    x_shift = 0,
-    n_points = 20,
-    scale_x = 1,
-    scale_y = 1,
-    scale_z = 1
-) {
+stablish_faces <- function(n_rings, n, top_order, bottom_order){
+  idx_ring <- vector("numeric", length = n_rings)
 
+  idx_top <- 1
+  idx_ring[1]  <- 2
+
+  for (i in 2:n_rings){
+    idx_ring[i] <- idx_ring[i-1] + n
+  }
+
+  idx_bottom <- idx_ring[n_rings] + n
+
+  pieces <- list()
+
+  faces_top <- matrix(0, nrow = n, ncol = 3)
+
+  for (i in 1:n) {
+    next_i <- ifelse(i == n, 1, i + 1)
+    faces_top[i, ] <- make_triangle(
+      idx_ring[1] + i - 1,
+      idx_ring[1] + next_i - 1,
+      idx_top,
+      top_order
+    )
+  }
+
+  pieces <- c(pieces, list(faces_top))
+
+  faces <- vector("list", length = n_rings - 1)
+
+  for (i in 1:(n_rings - 1)) {
+    faces[[i]] <- connect_rings(idx_ring[i], idx_ring[i+1], n)
+  }
+
+  pieces <- c(pieces, faces)
+
+  faces_bottom <- matrix(0, nrow = n, ncol = 3)
+
+  for (i in 1:n) {
+    next_i <- ifelse(i == n, 1, i + 1)
+
+    faces_bottom[i, ] <- make_triangle(
+      idx_ring[n_rings] + i - 1,
+      idx_ring[n_rings] + next_i - 1,
+      idx_bottom,
+      bottom_order
+    )
+  }
+
+  pieces <- c(pieces, list(faces_bottom))
+  
+  return (do.call(rbind, pieces))
+}
+
+make_triangle <- function(a, b, c, order){
+  switch(
+    order,
+    "abc" = c(a, b, c),
+    "acb" = c(a, c, b),
+    "bac" = c(b, a, c),
+    "bca" = c(b, c, a),
+    "cab" = c(c, a, b),
+    "cba" = c(c, b, a),
+    stop("order must be: abc, acb, bac, bca, cab, cba")
+  )
+}
+
+make_limb <- function(name = "limb", z0 = 0, y_shift = 0, x_shift = 0, n_points = 20, scale_x = 1, scale_y = 1, scale_z = 1) {
   limb_tip <- c(0, 0, 0)
   
   ring1 <- make_ring(0.10 * scale_x, 0.08 * scale_y, 0.18 * scale_z, n_points = n_points)
@@ -229,49 +286,9 @@ make_limb <- function(
   limb_tip <- limb_tip + c(x_shift, y_shift, z0)
   limb_end <- limb_end + c(x_shift, y_shift, z0)
   
-  limb_vertex <- rbind(
-    limb_tip,
-    ring1,
-    ring2,
-    ring3,
-    limb_end
-  )
+  limb_vertex <- rbind(limb_tip, ring1, ring2, ring3, limb_end)
   
-  idx_tip   <- 1
-  idx_ring1 <- 2
-  idx_ring2 <- idx_ring1 + n_points
-  idx_ring3 <- idx_ring2 + n_points
-  idx_end   <- idx_ring3 + n_points
-  
-  limb_faces_base <- matrix(0, nrow = n_points, ncol = 3)
-  for (i in 1:n_points) {
-    next_i <- ifelse(i == n_points, 1, i + 1)
-    limb_faces_base[i, ] <- c(
-      idx_tip,
-      idx_ring1 + next_i - 1,
-      idx_ring1 + i - 1
-    )
-  }
-  
-  limb_faces_12 <- connect_rings(idx_ring1, idx_ring2, n_points)
-  limb_faces_23 <- connect_rings(idx_ring2, idx_ring3, n_points)
-  
-  limb_faces_top <- matrix(0, nrow = n_points, ncol = 3)
-  for (i in 1:n_points) {
-    next_i <- ifelse(i == n_points, 1, i + 1)
-    limb_faces_top[i, ] <- c(
-      idx_ring3 + i - 1,
-      idx_ring3 + next_i - 1,
-      idx_end
-    )
-  }
-  
-  limb_faces <- rbind(
-    limb_faces_base,
-    limb_faces_12,
-    limb_faces_23,
-    limb_faces_top
-  )
+  limb_faces <- stablish_faces(n_rings = 3, n = n_points, top_order = "acb", bottom_order = "abc")
   
   create_part(name, limb_vertex, limb_faces)
 }
@@ -289,10 +306,10 @@ tilt_limb_down <- function(part, amount = 0.6, side = "right") {
   vertex <- part$vertex
   
   if (side == "right") {
-    x0 <- min(vertex[,1])   # lado pegado al body
+    x0 <- min(vertex[,1])
     vertex[,3] <- vertex[,3] - amount * (vertex[,1] - x0)
   } else {
-    x0 <- max(vertex[,1])   # lado pegado al body en el brazo izquierdo
+    x0 <- max(vertex[,1])
     vertex[,3] <- vertex[,3] - amount * (x0 - vertex[,1])
   }
   
@@ -301,7 +318,7 @@ tilt_limb_down <- function(part, amount = 0.6, side = "right") {
 }
 
 # Create the base Porygon-Z model
-## Body: egg form
+## Body
 n_body <- 50
 
 top    <- c(0, 0,  1.2)
@@ -313,66 +330,18 @@ ring4  <- make_ring(0.2, 0.45, -1.0, n_points = n_body)
 
 bottom <- c(0, 0, -1.4)
 
-body_vertex <- rbind(
-  top,
-  ring1,
-  ring2,
-  ring3,
-  ring4,
-  bottom
-)
+body_vertex <- rbind(top, ring1, ring2, ring3, ring4, bottom)
 
-idx_top    <- 1
-idx_ring1  <- 2
-idx_ring2  <- idx_ring1 + n_body
-idx_ring3  <- idx_ring2 + n_body
-idx_ring4  <- idx_ring3 + n_body
-idx_bottom <- idx_ring4 + n_body
-
-faces_top <- matrix(0, nrow = n_body, ncol = 3)
-
-for (i in 1:n_body) {
-  next_i <- ifelse(i == n_body, 1, i + 1)
-  
-  faces_top[i, ] <- c(
-    idx_top,
-    idx_ring1 + i - 1,
-    idx_ring1 + next_i - 1
-  )
-}
-
-faces_12 <- connect_rings(idx_ring1, idx_ring2, n_body)
-faces_23 <- connect_rings(idx_ring2, idx_ring3, n_body)
-faces_34 <- connect_rings(idx_ring3, idx_ring4, n_body)
-
-faces_bottom <- matrix(0, nrow = n_body, ncol = 3)
-
-for (i in 1:n_body) {
-  next_i <- ifelse(i == n_body, 1, i + 1)
-  
-  faces_bottom[i, ] <- c(
-    idx_ring4 + i - 1,
-    idx_bottom,
-    idx_ring4 + next_i - 1
-  )
-}
-
-body_faces <- rbind(
-  faces_top,
-  faces_12,
-  faces_23,
-  faces_34,
-  faces_bottom
-)
+body_faces <- stablish_faces(n_rings = 4, n = n_body, top_order = "cab", bottom_order = "acb")
 
 body <- create_part("body", body_vertex, body_faces)
 ##################################
 
-## Head: separated into skull, eyes, beak, arrow
+## Head
 n_head <- 50
 z_head <- 2.15
 
-head_top    <- c(0, 0,  0.72 + z_head)
+head_top <- c(0, 0,  0.72 + z_head)
 
 head_ring1  <- make_ring(0.52, 0.46,  0.58 + z_head, n_points = n_head)
 head_ring2  <- make_ring(0.82, 0.72,  0.22 + z_head, n_points = n_head)
@@ -381,61 +350,14 @@ head_ring4  <- make_ring(0.50, 0.44, -0.50 + z_head, n_points = n_head)
 
 head_bottom <- c(0, 0, -0.68 + z_head)
 
-head_vertex <- rbind(
-  head_top,
-  head_ring1,
-  head_ring2,
-  head_ring3,
-  head_ring4,
-  head_bottom
-)
+head_vertex <- rbind(head_top, head_ring1,head_ring2, head_ring3, head_ring4, head_bottom)
 
-idx_head_top    <- 1
-idx_head_ring1  <- 2
-idx_head_ring2  <- idx_head_ring1 + n_head
-idx_head_ring3  <- idx_head_ring2 + n_head
-idx_head_ring4  <- idx_head_ring3 + n_head
-idx_head_bottom <- idx_head_ring4 + n_head
-
-head_faces_top <- matrix(0, nrow = n_head, ncol = 3)
-
-for (i in 1:n_head) {
-  next_i <- ifelse(i == n_head, 1, i + 1)
-  
-  head_faces_top[i, ] <- c(
-    idx_head_top,
-    idx_head_ring1 + i - 1,
-    idx_head_ring1 + next_i - 1
-  )
-}
-
-head_faces_12 <- connect_rings(idx_head_ring1, idx_head_ring2, n_head)
-head_faces_23 <- connect_rings(idx_head_ring2, idx_head_ring3, n_head)
-head_faces_34 <- connect_rings(idx_head_ring3, idx_head_ring4, n_head)
-
-head_faces_bottom <- matrix(0, nrow = n_head, ncol = 3)
-
-for (i in 1:n_head) {
-  next_i <- ifelse(i == n_head, 1, i + 1)
-  
-  head_faces_bottom[i, ] <- c(
-    idx_head_ring4 + i - 1,
-    idx_head_bottom,
-    idx_head_ring4 + next_i - 1
-  )
-}
-
-head_faces <- rbind(
-  head_faces_top,
-  head_faces_12,
-  head_faces_23,
-  head_faces_34,
-  head_faces_bottom
-)
+head_faces <- stablish_faces(n_rings = 4, n = n_head, top_order = "cab", bottom_order = "acb")
 
 head <- create_part("head", head_vertex, head_faces)
+##################################
 
-### Beak
+## Beak
 n_beak <- 30
 z_beak <- 2.1
 
@@ -451,49 +373,9 @@ beak_ring2[,3] <- beak_ring2[,3] + z_beak
 
 beak_front <- c(0, -1.5, z_beak)
 
-beak_vertex <- rbind(
-  beak_back,
-  beak_ring1,
-  beak_ring2,
-  beak_front
-)
+beak_vertex <- rbind(beak_back, beak_ring1, beak_ring2, beak_front)
 
-idx_beak_back  <- 1
-idx_beak_ring1 <- 2
-idx_beak_ring2 <- idx_beak_ring1 + n_beak
-idx_beak_front <- idx_beak_ring2 + n_beak
-
-beak_faces_back <- matrix(0, nrow = n_beak, ncol = 3)
-
-for (i in 1:n_beak) {
-  next_i <- ifelse(i == n_beak, 1, i + 1)
-  
-  beak_faces_back[i, ] <- c(
-    idx_beak_back,
-    idx_beak_ring1 + next_i - 1,
-    idx_beak_ring1 + i - 1
-  )
-}
-
-beak_faces_12 <- connect_rings(idx_beak_ring1, idx_beak_ring2, n_beak)
-
-beak_faces_front <- matrix(0, nrow = n_beak, ncol = 3)
-
-for (i in 1:n_beak) {
-  next_i <- ifelse(i == n_beak, 1, i + 1)
-  
-  beak_faces_front[i, ] <- c(
-    idx_beak_ring2 + i - 1,
-    idx_beak_ring2 + next_i - 1,
-    idx_beak_front
-  )
-}
-
-beak_faces <- rbind(
-  beak_faces_back,
-  beak_faces_12,
-  beak_faces_front
-)
+beak_faces <- stablish_faces(n_rings = 2, n = n_beak, top_order = "cba", bottom_order = "abc")
 
 beak <- create_part("beak", beak_vertex, beak_faces)
 ###################################
@@ -514,60 +396,14 @@ antenna_ring4[,2] <- antenna_ring4[,2] + 0.03
 
 antenna_top <- c(0, 0.03 * s_antenna, 3.16 * s_antenna)
 
-antenna_vertex <- rbind(
-  antenna_base,
-  antenna_ring1,
-  antenna_ring2,
-  antenna_ring3,
-  antenna_ring4,
-  antenna_top
-)
+antenna_vertex <- rbind(antenna_base, antenna_ring1, antenna_ring2, antenna_ring3, antenna_ring4, antenna_top)
 
-idx_ant_base  <- 1
-idx_ant_ring1 <- 2
-idx_ant_ring2 <- idx_ant_ring1 + n_antenna
-idx_ant_ring3 <- idx_ant_ring2 + n_antenna
-idx_ant_ring4 <- idx_ant_ring3 + n_antenna
-idx_ant_top   <- idx_ant_ring4 + n_antenna
-
-antenna_faces_base <- matrix(0, nrow = n_antenna, ncol = 3)
-
-for (i in 1:n_antenna) {
-  next_i <- ifelse(i == n_antenna, 1, i + 1)
-  antenna_faces_base[i, ] <- c(
-    idx_ant_base,
-    idx_ant_ring1 + next_i - 1,
-    idx_ant_ring1 + i - 1
-  )
-}
-
-antenna_faces_12 <- connect_rings(idx_ant_ring1, idx_ant_ring2, n_antenna)
-antenna_faces_23 <- connect_rings(idx_ant_ring2, idx_ant_ring3, n_antenna)
-antenna_faces_34 <- connect_rings(idx_ant_ring3, idx_ant_ring4, n_antenna)
-
-antenna_faces_top <- matrix(0, nrow = n_antenna, ncol = 3)
-
-for (i in 1:n_antenna) {
-  next_i <- ifelse(i == n_antenna, 1, i + 1)
-  antenna_faces_top[i, ] <- c(
-    idx_ant_ring4 + i - 1,
-    idx_ant_ring4 + next_i - 1,
-    idx_ant_top
-  )
-}
-
-antenna_faces <- rbind(
-  antenna_faces_base,
-  antenna_faces_12,
-  antenna_faces_23,
-  antenna_faces_34,
-  antenna_faces_top
-)
+antenna_faces <- stablish_faces(n_rings = 4, n = n_antenna, top_order = "acb", bottom_order = "abc")
 
 antenna <- create_part("antenna", antenna_vertex, antenna_faces)
 ###################################
 
-## Arms and Tail
+## Arms
 s_arm <- 1.25
 s_tail <- 1.1
 
@@ -601,7 +437,9 @@ left_arm <- tilt_limb_down(left_arm, amount = 0.65, side = "left")
 
 left_arm$vertex[,1] <- left_arm$vertex[,1] - 0.7
 left_arm$vertex[,3] <- left_arm$vertex[,3] + 0.1
+##################################
 
+## Tail
 tail <- make_limb(
   name = "tail",
   x_shift = 0.00,
@@ -612,6 +450,7 @@ tail <- make_limb(
   scale_y = 0.90 * s_tail,
   scale_z = 1.90 * s_tail
 )
+##################################
 
 # Stablish the Porygon-Z
 porygon_z <- list(
@@ -624,6 +463,7 @@ porygon_z <- list(
   tail = tail
 )
 
+# Draw the Porygon-Z base
 draw_model(porygon_z)
 
 # Testing
