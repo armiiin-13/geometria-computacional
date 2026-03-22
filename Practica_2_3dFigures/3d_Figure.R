@@ -1,3 +1,10 @@
+##################################################################################
+# Ejercicio 5: Transformaciones Afines
+# Autores: Rodrigo López Torres y Arminda García Moreno
+# Fecha : 09/02/2026 
+# Propósito: Trabajar con conceptos de geometría afín en R
+##################################################################################
+
 # Load packages for 3d graphics
 library(rgl)
 
