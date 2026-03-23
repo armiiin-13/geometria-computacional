@@ -327,7 +327,7 @@ Homotecia<-function(p,centro,k){
   text3d(p[1], p[2], p[3], texts="p", adj=c(0.5, -1))
   #centro
   points3d(centro[1], centro[2], centro[3], col="green", size=10)
-  text3d(p_new[1], p_new[2], p_new[3], texts="pcentro", col="green", adj=c(0.5, -1))
+  text3d(centro[1], centro[2], centro[3], texts="pcentro", col="green", adj=c(0.5, -1))
   
   #Punto trasladado
   points3d(p_new[1], p_new[2], p_new[3], col="red", size=10)
