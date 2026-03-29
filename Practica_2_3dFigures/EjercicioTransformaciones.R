@@ -61,7 +61,7 @@ Traslacion(c(2,3),c(1,1))
 
 
 #Traslacion 3d#########################
-Traslacion3d<-function(p,q)
+Traslacion3d1<-function(p,q)
 {
   p_new<-c(0,0,0)
   p_new[1]=p[1]+q[1]
@@ -93,7 +93,7 @@ Traslacion3d<-function(p,q)
   arrows3D(p[1],p[2],p[3],p_new[1],p_new[2],p_new[3],col="blue",lwd=2)
   p_new
 }
-Traslacion3d(c(2,1,-1),c(2,1,-1))
+Traslacion3d1(c(2,1,-1),c(2,1,-1))
 
 #Traslacion 3d 2 ###############
 Traslacion3d <- function(p, q) {
@@ -281,7 +281,7 @@ Rotacion<-function(p,theta,eje) #respecto al origen
     
     #Punto trasladado
     points3d(p_new[1], p_new[2], p_new[3], col="red", size=10)
-    text3d(p_new[1], p_new[2], p_new[3], texts="p trasladado", col="red", adj=c(0.5, -1))
+    text3d(p_new[1], p_new[2], p_new[3], texts="p rotado", col="red", adj=c(0.5, -1))
     
     lines3d(x = c(p[1], p_new[1]), 
             y = c(p[2], p_new[2]), 
@@ -327,7 +327,7 @@ Homotecia<-function(p,centro,k){
   text3d(p[1], p[2], p[3], texts="p", adj=c(0.5, -1))
   #centro
   points3d(centro[1], centro[2], centro[3], col="green", size=10)
-  text3d(p_new[1], p_new[2], p_new[3], texts="pcentro", col="green", adj=c(0.5, -1))
+  text3d(centro[1], centro[2], centro[3], texts="pcentro", col="green", adj=c(0.5, -1))
   
   #Punto trasladado
   points3d(p_new[1], p_new[2], p_new[3], col="red", size=10)
