@@ -231,7 +231,7 @@ stablish_faces <- function(n_rings, n, top_order, bottom_order){
   pieces <- c(pieces, list(faces_top))
 
   faces <- vector("list", length = n_rings - 1)
-
+ 
   for (i in 1:(n_rings - 1)) {
     faces[[i]] <- connect_rings(idx_ring[i], idx_ring[i+1], n)
   }
@@ -474,7 +474,7 @@ porygon_z <- list(
 draw_model(porygon_z)
 
 # Testing
-body = traslation(porygon_z$body, c(20,4,-10))
+body = traslation(porygon_z$body, c(2,1,-1))
 porygon_z$body = body
 draw_model(porygon_z)
 
