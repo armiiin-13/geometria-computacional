@@ -1,0 +1,78 @@
+Tricorner:Chinatown
+Tricorner:Old Gotham
+Chinatown:Garment District
+Chinatown:Diamond District
+Chinatown:Old Gotham
+Old Gotham:Diamond District
+Old Gotham:North Side
+Old Gotham:Downtown
+Old Gotham:Financial District
+Garment District:Cape Finger
+Garment District:Diamond District
+Garment District:East End
+Garment District:Finger Hill
+Diamond District:Finger Hill
+Diamond District:North Side
+Finger Hill:East End
+Finger Hill:North Side
+Finger Hill:Park Av.
+East End:Cape Finger
+East End:Kubrick District
+North Side:Downtown
+North Side:West End
+North Side:Park Av.
+Downtown:Financial District
+Downtown:Little Italy
+Downtown:West End
+Financial District: Little Italy
+Financial District: Old Docks
+Little Italy:Old Docks
+West End:Grant Point
+West End:Little Italy
+Old Docks:West End
+Grant Point:Central West Side
+Grant Point:Coventry
+Grant Point:Moore Bay
+Park Av.:Central West Side
+Park Av.:Kane Town
+Park Av.:Central East Side
+Central East Side:Coventry
+Kane Town:Kubrick District
+Kane Town:South Sprang
+Kane Town:North Sprang
+Kane Town:Central East Side
+Kubrick District:Cape Finger
+Kubrick District:South Sprang
+North Sprang:Central East Side
+North Sprang:Coventry
+North Sprang:The Narrow
+Central East Side:Coventry
+South Sprang:The Narrow
+South Sprang:North Sprang
+Coventry:Pinkney
+Coventry:Burnsley
+Coventry:Moore Bay
+The Narrow:Park Row
+The Narrow:Pinkney
+Moore Bay:Robbins Ville
+Moore Bay:Coal Lane
+Moore Bay:Burnsley
+Burnsley:Pinkney
+Burnsley:Coal Lane
+Burnsley:The Bowery
+Burnsley:Newtown
+Pinkney:Park Row
+Park Row:Crowne Hills
+Park Row:Newtown
+Cape Finger:Sommerset
+The Bowery:Newtown
+The Bowery:Coal Lane
+The Bowery:Ottisport
+The Bowery:Ottisburg
+Ottisport:Coal Lane
+Robbins Ville:Coal Lane
+Ottisburg:Newtown
+Ottisburg:Crowne Hills
+Ottisburg:Bristol
+Bristol:East Bristol
+Ottisburg:Amusement Mile
