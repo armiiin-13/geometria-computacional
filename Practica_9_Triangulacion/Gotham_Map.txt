@@ -24,8 +24,8 @@ North Side:Park Av.
 Downtown:Financial District
 Downtown:Little Italy
 Downtown:West End
-Financial District: Little Italy
-Financial District: Old Docks
+Financial District:Little Italy
+Financial District:Old Docks
 Little Italy:Old Docks
 West End:Grant Point
 West End:Little Italy

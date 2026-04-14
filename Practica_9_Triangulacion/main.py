@@ -16,7 +16,7 @@ class City:
         return hash(self.name)
     
     def __eq__(self, other):
-        return isinstance(other, City) and self.name == other.name
+        return isinstance(other, City) and self.id == other.id
 
     def __lt__(self, other):
         return self.id > other.id
