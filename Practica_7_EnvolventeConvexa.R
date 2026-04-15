@@ -5,7 +5,7 @@
 # Propósito: implementar el algoritmo de Sean de Graham
 ##############################################################################
 
-# Exercise 1 (OPTIONAL)
+# Exercise 1
 coordenadas_bar <- function(A,B,C,D){
   #compruebo si hay puntos repetidos
   if( all(A==B) || all(A==C) || all(B==C) ){
@@ -65,6 +65,7 @@ coordenadas_bar <- function(A,B,C,D){
   text(C[1],C[2],"C",pos=3)
   text(D[1],D[2],"D",pos=3)
 }
+
 #ejemplo
 A <- c(0,0)
 B <- c(2,0)
@@ -74,10 +75,6 @@ coordenadas_bar(A,B,C,D)
 
 # Exercise 2
 right_turn_on_line <- function(p1, p2, p3){
-  # Notilla de Armin: voy a suponer para el algoritmo que si hace un giro a la
-  # derecha la función devuelve TRUE y si no FALSE. Si quieres devolver otra
-  # cosa me dices para cambiar mi implementación (btw digo lo mismo de los parámetros)
-  
   if (length(p1) != 2 || length(p2) != 2 || length(p3) != 2) {
     stop("Cada punto debe tener exactamente dos coordenadas: c(x, y).")
   }
@@ -91,20 +88,15 @@ right_turn_on_line <- function(p1, p2, p3){
   
   y_recta <- m * C[1] + n
   
-  return(C[2] < y_recta)
+  return(C[2] <= y_recta)
 }
 
 # Exercise 3
 right_turn_matrix <- function(p1, p2, p3){
-  # Notilla de Armin: voy a suponer para el algoritmo que si hace un giro a la
-  # derecha la función devuelve TRUE y si no FALSE. Si quieres devolver otra
-  # cosa me dices para cambiar mi implementación. Los parámetros también elijes
-  # tú lo que mejor veas, porque para la implementación voy a usar la función
-  # anterior :)
   det <- (p2[1] - p1[1]) * (p3[2] - p1[2]) -
     (p2[2] - p1[2]) * (p3[1] - p1[1])
   
-  if (det < 0) {
+  if (det <= 0) {
     return(TRUE)   # giro a la derecha
   }
   else {
@@ -163,7 +155,7 @@ scan_de_graham_algorithm <- function(P){
   convex_hull <- list()
   
   while (i + 2 <= n){
-    if (right_turn_on_line(P_ordered[[i]], P_ordered[[i+1]], P_ordered[[i+2]])){
+    if (right_turn_matrix(P_ordered[[i]], P_ordered[[i+1]], P_ordered[[i+2]])){
       # there is a right turn --> add P_i to convex_hull list
       convex_hull <- c(convex_hull, list(P_ordered[[i]]))
       i <- i + 1
