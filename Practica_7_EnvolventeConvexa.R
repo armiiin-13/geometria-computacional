@@ -6,6 +6,71 @@
 ##############################################################################
 
 # Exercise 1 (OPTIONAL)
+coordenadas_bar <- function(A,B,C,D){
+  #compruebo si hay puntos repetidos
+  if( all(A==B) || all(A==C) || all(B==C) ){
+    stop("A, B y C deben ser distintos")
+  }
+  # veo que no sean colineales
+  det <- (B[1]-A[1])*(C[2]-A[2]) -
+    (B[2]-A[2])*(C[1]-A[1])
+  
+  if(det == 0){
+    stop("A, B y C son colineales")
+  }
+  # sistema baricentrico
+  M <- matrix(c(
+    A[1], B[1], C[1],
+    A[2], B[2], C[2],
+    1,    1,    1
+  ), nrow=3, byrow=TRUE)  #matriz del sistema de ecuaciones variables lamda 
+  
+  b <- c(D[1], D[2], 1) #solución buscada 
+  
+  lambda <- solve(M,b) #resolvemos el sistema
+  
+  la <- lambda[1]
+  lb <- lambda[2]
+  lc <- lambda[3]
+  #uso cat para imprimir para poder imprimir el resultado de la variable de forma continua
+  cat("lambda_A =", la,"\n")
+  cat("lambda_B =", lb,"\n")
+  cat("lambda_C =", lc,"\n")
+  #veamos si la combinación es convexa
+  convexa <- (la >= 0 && lb >= 0 && lc >= 0)
+  if(convexa){
+    cat("Combinacion convexa\n")
+  } else {
+    cat("Combinacion NO convexa\n")
+  }
+  
+  #bordes del plot
+  xs <- c(A[1],B[1],C[1],D[1])
+  ys <- c(A[2],B[2],C[2],D[2])
+  #poligonal ABC usando plot
+  x <- c(A[1], B[1], C[1], A[1])
+  y <- c(A[2], B[2], C[2], A[2])
+  plot(x, y, type="l", lwd=2, asp=1,
+       xlim=range(xs), ylim=range(ys),
+       xlab="X", ylab="Y",
+       main="Poligonal ABC y punto D")
+  #puntos
+  points(A[1],A[2],pch=19)
+  points(B[1],B[2],pch=19)
+  points(C[1],C[2],pch=19)
+  points(D[1],D[2],col="red",pch=19)
+  #etiquetas
+  text(A[1],A[2],"A",pos=3)
+  text(B[1],B[2],"B",pos=3)
+  text(C[1],C[2],"C",pos=3)
+  text(D[1],D[2],"D",pos=3)
+}
+#ejemplo
+A <- c(0,0)
+B <- c(2,0)
+C <- c(4,2)
+D <- c(2,1)
+coordenadas_bar(A,B,C,D)
 
 # Exercise 2
 right_turn_on_line <- function(p1, p2, p3){
@@ -13,15 +78,20 @@ right_turn_on_line <- function(p1, p2, p3){
   # derecha la función devuelve TRUE y si no FALSE. Si quieres devolver otra
   # cosa me dices para cambiar mi implementación (btw digo lo mismo de los parámetros)
   
-  
   if (length(p1) != 2 || length(p2) != 2 || length(p3) != 2) {
     stop("Cada punto debe tener exactamente dos coordenadas: c(x, y).")
   }
+  # por si hay recta vertical
+  if (B[1] == A[1]) {
+    return(C[1] > A[1])
+  }
   
-  cross_prod <- (p2[1] - p1[1]) * (p3[2] - p1[2]) - 
-    (p2[2] - p1[2]) * (p3[1] - p1[1])
+  m <- (B[2] - A[2]) / (B[1] - A[1])
+  n <- A[2] - m * A[1]
   
-  return(cross_prod <= 0)
+  y_recta <- m * C[1] + n
+  
+  return(C[2] < y_recta)
 }
 
 # Exercise 3
@@ -31,7 +101,15 @@ right_turn_matrix <- function(p1, p2, p3){
   # cosa me dices para cambiar mi implementación. Los parámetros también elijes
   # tú lo que mejor veas, porque para la implementación voy a usar la función
   # anterior :)
+  det <- (p2[1] - p1[1]) * (p3[2] - p1[2]) -
+    (p2[2] - p1[2]) * (p3[1] - p1[1])
   
+  if (det < 0) {
+    return(TRUE)   # giro a la derecha
+  }
+  else {
+    return(FALSE)  # izquierda o alineados
+  }
 }
 
 # Auxiliar Functions
