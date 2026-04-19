@@ -1,3 +1,12 @@
+#############################################################################
+# Práctica 9: Triangulacion
+# Autores: Rodrigo López Torres y Arminda García Moreno
+# Fecha : 13/04/2026 
+# Propósito: realizar un algoritmo de coloración de grafos
+##############################################################################
+
+###### PYTHON FILE ######
+
 # Import (plot dynamic graph)
 from pyvis.network import Network
 import heapq
@@ -66,7 +75,7 @@ def generate_html(graph, edges):
     for edge in edges:
         net.add_edge(edge.vertex_1.name, edge.vertex_2.name, color="black")
     
-    net.show("coloration_graph.html", notebook=False)
+    net.show("Practica_9_Triangulacion/coloration_graph.html", notebook=False)
 
 # Create Data
 def import_data(path):
@@ -99,6 +108,6 @@ def import_data(path):
     return graph, edges
 
 # Testing
-test_graph, test_edges = import_data("Gotham_Map.txt")
+test_graph, test_edges = import_data("Practica_9_Triangulacion/Gotham_Map.txt")
 test_graph = coloration_algoritm(test_graph)
 generate_html(test_graph, test_edges)
