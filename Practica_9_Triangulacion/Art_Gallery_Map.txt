@@ -1,5 +1,5 @@
-Pink:Lylac
-Lylac:Purple
+Pink:Lilac
+Lilac:Purple
 Purple:Blue
 Purple:Light Blue
 Mint Green:Green
