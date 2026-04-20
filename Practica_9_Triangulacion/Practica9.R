@@ -188,3 +188,21 @@ resultado <- triangulacion(poligono)
 print(resultado)
 
 dibujar_triangulacion(poligono, resultado)
+
+#### Galería de Arte
+art_gallery <- matrix(c(
+  0, 0,
+  12, 0,
+  10, 4,
+  9, 2,
+  8, 2,
+  7, 4,
+  6, 2,
+  5, 2, 
+  4, 4,
+  3, 2,
+  2, 2,
+  1, 4
+), byrow = TRUE, ncol = 2)
+resultado <- triangulacion(art_gallery)
+dibujar_triangulacion(art_gallery, resultado)

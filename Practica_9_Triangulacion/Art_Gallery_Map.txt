@@ -1,0 +1,9 @@
+Pink:Lylac
+Lylac:Purple
+Purple:Blue
+Purple:Light Blue
+Mint Green:Green
+Light Blue:Mint Green
+Mint Green:Gray
+Gray:Orange
+Orange:Red

@@ -66,7 +66,7 @@ def coloration_algoritm(graph):
     return graph
 
 # Create Dynamic HTML to show graph
-def generate_html(graph, edges):
+def generate_html(graph, edges, idx_path):
     net = Network(directed=False)
     
     for node in graph:
@@ -75,7 +75,10 @@ def generate_html(graph, edges):
     for edge in edges:
         net.add_edge(edge.vertex_1.name, edge.vertex_2.name, color="black")
     
-    net.show("Practica_9_Triangulacion/coloration_graph.html", notebook=False)
+    if idx_path == 1:
+      net.show("Practica_9_Triangulacion/coloration_graph.html", notebook = False)
+    else:
+      net.show("Practica_9_Triangulacion/art_gallery_graph.html", notebook = False)
 
 # Create Data
 def import_data(path):
@@ -110,4 +113,26 @@ def import_data(path):
 # Testing
 test_graph, test_edges = import_data("Practica_9_Triangulacion/Gotham_Map.txt")
 test_graph = coloration_algoritm(test_graph)
-generate_html(test_graph, test_edges)
+generate_html(test_graph, test_edges, 1)
+
+# Art Gallery Test
+art_gallery_graph, art_gallery_edges = import_data("Practica_9_Triangulacion/Art_Gallery_Map.txt")
+art_gallery_graph = coloration_algoritm(art_gallery_graph)
+generate_html(art_gallery_graph, art_gallery_edges, 2)
+
+## Count colours
+color_counts = [0] * len(colors)
+
+for node in art_gallery_graph:
+  color_counts[node.color] += 1
+
+best_index = 0
+best_count = -1
+  
+for i in range(0,len(colors)):
+  if best_count > color_counts[i] > 0:
+    best_index = i
+    best_count = color_counts[i]
+
+print("Color:", end=' ')
+print(str(colors[best_index]))

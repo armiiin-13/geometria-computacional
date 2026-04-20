@@ -6,6 +6,6 @@
 ##############################################################################
 
 reticulate::repl_python()
-
+exit()
 library(reticulate)
-py_install("pyvis")
+py_require("pyvis")
