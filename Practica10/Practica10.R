@@ -109,29 +109,20 @@ dibujar_triangulacion(V, resultado)
 x <- datos$x
 y <- datos$y
 dxy1 <- deldir(x,y,dpl=NULL, rw=NULL, plotit=TRUE)
+#Extraer triangulación
+tri <- triang.list(dxy1)
+#Mostrar resultados
+print(tri)
+#Graficar puntos marcados
 plot(dxy1)
+points(x, y, col = "red", pch = 19)
+#Sin los puntos marcados
+plot(dxy1)
+
+
 
 # centroides de la triangulacion
 l<-tile.list(dxy1)
 g<-tile.centroids(l)
 plot(l,close=TRUE)
 points(g,pch=20,col="red")
-# Ejemplo con voronoi
-set.seed(1)
-pts <-cbind(X=rnorm(500,rep(seq(1,9,by=2)/10,100),.022),Y=rnorm(500,.5,.15))
-plot(pts)
-
-
-
-# Generar algunos puntos de ejemplo
-x <- datos$x
-y <- datos$y
-# Calcular triangulación de Delaunay
-d <- deldir(x, y)
-# Extraer triangulación
-tri <- triang.list(d)
-# Mostrar resultados
-print(tri)
-# Graficar
-plot(d)
-points(x, y, col = "red", pch = 19)
