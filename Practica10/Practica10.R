@@ -164,3 +164,33 @@ triangles_deldir <- lapply(tri, function(t) {
 areas_deldir <- areas_triangles(triangles_deldir)
 area_total_deldir <- sum(areas_deldir)
 area_total_deldir
+
+# Nave P1 -> Delauney
+datos_p1 <- read_excel("Practica_1_StarWars/DataSet.xlsx")
+head(datos_p1)
+x <- datos_p1$x
+y <- datos_p1$y
+V <- as.matrix(datos_p1[, c("x", "y")])
+
+## Delauney Triangulacion
+x <- datos_p1$x
+y <- datos_p1$y
+dxy1_p1 <- deldir(x,y,dpl=NULL, rw=NULL, plotit=TRUE)
+tri_p1 <- triang.list(dxy1_p1)
+print(tri_p1)
+plot(dxy1_p1)
+points(x, y, col = "red", pch = 19)
+plot(dxy1_p1)
+l_p1<-tile.list(dxy1_p1)
+g_p1<-tile.centroids(l_p1)
+plot(l_p1,close=TRUE)
+points(g_p1,pch=20,col="red")
+triangles_deldir_p1 <- lapply(tri_p1, function(t) {
+  matrix(
+    c(t$x, t$y),
+    ncol = 2
+  )
+})
+areas_deldir_p1 <- areas_triangles(triangles_deldir_p1)
+area_total_deldir_p1 <- sum(areas_deldir_p1)
+area_total_deldir_p1
